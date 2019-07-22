@@ -1,0 +1,2 @@
+# Stich
+For Image registration
