@@ -13,8 +13,9 @@ end
 Vq = interp2(X,Y,mcmi,Xq,Yq,'spline');
 [ma,mind] = max(Vq(:));
 [iy,ix] = ind2sub(size(Vq),mind);
-cl = [ix iy];% + [bb(1) bb(2)];% - ss;
-%             cl = cor/0.01;
+cl = [ix iy];%
+
+%
 wscor = cl;
-%rotcor = getRotCor(im1,im2,[-10,10],1);
+%
 end

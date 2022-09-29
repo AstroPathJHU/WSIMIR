@@ -1,77 +1,78 @@
-function [regData,ihcrs,ifpaths,b,h,w,scale,ihcscale] = checkVars(ihc,ifdir)
+%% checkVars
+%% Created by: Joshua Doyle 
+%% Edited by: Benjamin Green
+%% -----------------------------------------------------------
+%% Description
+% part of the registration protocol for slides from different microscopes
+% reads in the images to memory and gets image parameters
+% -- Possible Improvement in readYCBCr2RGB for parloop reading in subset of
+% main IHC image to improve read time -- use imread 'Region Property'
+%% -----------------------------------------------------------
+function [regData,ihcrs,ifpaths,b,h,w,scale,ihcscale] ...
+    = checkVars(ihc,ifdir)
+%
 % pixels/u - Vectra scale (mft provided)
+%
 scale = 1.9981018;
+%
 % Number of bands in IF images
+%
 ncomponents = 8;
+%
 % pixels/u - Hamamatsu scale (mft provided)
+%
 ihcscale = 2.173913;
-
-if ~exist('regData', 'var')
-    %myDir = uigetdir('Load Componenet Tiff Directory'); %gets directory
-    ifpaths = dir(fullfile(ifdir,'*component_data.tif'));
-    
-    regData = struct('filename',{{}},'micronLoc',{{}},'regLoc',{{}});
-    for i1 = 1:length(ifpaths)
-        baseFileName = ifpaths(i1).name;
-%         B = strsplit(baseFileName,'_');
-%         if length(B) > 3
-%             if strcmp(B{4},'binary')
-%                 imstr.binaryfile = baseFileName;
-%             end
-%             if strcmp(B{4},'composite')
-%                 imstr.componentfile = baseFileName;
-%             end
-%             if strcmp(B{4},'phenotype')
-%                 imstr.phenofile = baseFileName;
-%             end
-%             
-%             if strcmp(B{8},'component')
-%                 imstr.compositefile = baseFileName;
-                regData.filename{i1} = baseFileName;
-                C = strsplit(baseFileName,{'[',',',']'});
-                % TODO
-                % add if wholeslide || if TMA
-                regData.micronLoc{i1} = [str2double(C{2}) str2double(C{3})];
-                %regData.micronLoc{i1} = [str2double(C{6}) str2double(C{7})];
-%             end
-%         end
-    end
-    b = cast(reshape(cell2mat(regData.micronLoc),2,[]),'uint32')';
+%
+% get if image names
+%
+ifpaths = dir(fullfile(ifdir, '*component_data.tif'));
+if isempty(ifpaths)
+    msg = ['Error: could not find IF images in - ',ifpaths];
+    error(msg)
 end
-
-% if ~exist('miData','var')
-%     load('miData');
-%     mirs = reshape(miData.mmi,[],1);
-%     midata2 = zeros(length(mirs),1);
-%     for i1 = 1:length(mirs)
-%         midata2(i1) = sum(mirs{i1}(:));
-%     end
-%     [ma,mind] = max(midata2);
-%     [I,J] = ind2sub([9,9],mind);
-% end
-
-if ~exist('ihcrs','var')
-    
-    %[ihcfile,ihcpath] = uigetfile('*/*.tif','Select a full slide image for registration');
-    %tobj = Tiff([ihcpath,ihcfile],'r');
-    tobj = Tiff(ihc,'r');
-    origh = getTag(tobj,'ImageLength');
-    origw = getTag(tobj,'ImageWidth');
-    ihcrs = imresize(readYCbCr2RGB(tobj),[origh*scale/ihcscale,origw*scale/ihcscale]);
-    
-    %ihcrs = imresize(readYCbCr2RGB(tobj),[origh*scale/miData.param.scale{I,J}(2),origw*scale/miData.param.scale{I,J}(1)]);
-    
-    %     tobjATP = Tiff('Z:\stitch\Hamamatsu Channel Images\M41-ATPase.tif','r');
-    %     tobjHematox = Tiff('Z:\stitch\Hamamatsu Channel Images\M41-Hematoxyln.tif','r');
-    %     origh = getTag(tobjATP,'ImageLength');
-    %     origw = getTag(tobjATP,'ImageWidth');
-    %     ihcrs(:,:,1) = imresize(read(tobjATP),[origh*scale/miData.param.scale{I,J}(2),origw*scale/miData.param.scale{I,J}(1)]);
-    %     ihcrs(:,:,2) = imresize(read(tobjHematox),[origh*scale/miData.param.scale{I,J}(2),origw*scale/miData.param.scale{I,J}(1)]);
+%
+regData = struct('filename', {{}}, 'micronLoc', {{}}, 'regLoc', {{}});
+for i1 = 1:length(ifpaths)
+    baseFileName = ifpaths(i1).name;
+    regData.filename{i1} = baseFileName;
+    C = strsplit(baseFileName,{'[',',',']'});
+    regData.micronLoc{i1} = [str2double(C{2}) str2double(C{3})];
 end
-
+%
+% variable for registered locations
+%
+b = cast(reshape(cell2mat(regData.micronLoc),2,[]),'uint32')';
+%
+% get IHC image and size params
+%
+if ~exist(ihc,'file')
+    msg = ['Error: could not find IHC image - ',ihc];
+    error(msg)
+end
+%
+fprintf(1, 'Reading %s\n', ihc);
+%
+tic
+imf = imfinfo(ihc);
+level = find(ismember({imf(:).ImageDescription}, 'x20 z0'));
+origh = imf(level).Height;
+origw = imf(level).Width;
+%
+img = imread(ihc,level);
+ihcrs = imresize(img,...
+    [origh*scale/ihcscale,origw*scale/ihcscale]);
+clear img
+fprintf('           ');
+toc
+%
+% get IF size params
+%
 baseFileName = ifpaths(1).name;
 fullFileName = fullfile(ifdir, baseFileName);
-fprintf(1, 'Now reading %s\n', fullFileName);
-tobj = Tiff(fullFileName);
-img = makeTifIm(tobj,ncomponents);
-[h,w,bands] = size(img);
+img = imfinfo(fullFileName);
+h = img.Height;
+w = img.Width;
+regData.h = h; %hpf height
+regData.w = w; %hpf width
+%
+end

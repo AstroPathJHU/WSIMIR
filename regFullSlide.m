@@ -1,17 +1,26 @@
-function regFullSlide(ihc,ifdir)
-
-
-[rd,ihcf] = fullParReg(ihc,ifdir);
+%%
+function regFullSlide(wsimpath,tiledir)
+%
+tic
+wsimpath2 = replace(wsimpath,'.ndpi','.tif');
+if ~exist(wsimpath2,'file')
+    command = ['\\bki05\n$\bgcode2\ndpi2tiff.exe ',wsimpath];
+    try
+        system(command)
+    catch
+        error(['Error converting npdi to tif for ',wsimpath])
+    end
+end
+%
+toc
+[rd,wsimf] = fullParReg2(wsimpath2,tiledir);
 
 % IHC directory adjacent to ComponentTIFF
-S = strsplit(ifdir,'\');
-ihcdir = ['\',strjoin(S(1:end-2),'\'),'\IHC\HPFs\'];
-
+S = strsplit(wsimpath,'\');
+wsimdir = ['\',strjoin(S(1:end-1),'\'),'\HPFs\'];
 % crop IHC image to HPFs corresponding to MIF HPFs. Each IHC image is saved
-% as <specimen ID>_<Vectra coordinates>_IHC identical to the corresponding
+% as <Specimen ID>_<Vectra coordinates>_<WSI Image Type>.tif in parallel to the corresponding
 % MIF HPF.
-cropandwriteihc(rd,ihcf,ihcdir);                 
-
-
-
+cropandwritehpfs(rd,wsimf,wsimdir);                 
+toc
 end
