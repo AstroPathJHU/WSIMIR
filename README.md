@@ -1,5 +1,5 @@
 # <div align="center"> WSIMIR (Whole Slide Mutal Information Registration) </div>
-#### <div align="center"> Perform multi-modality whole slide to whole slide pathology image regstration</div>
+#### <div align="center"> Perform multi-modality whole slide to whole slide pathology image registration</div>
 #### <div align="center">Correspondence to: bgreen42@jhu.edu</div>
 
 ## 1. Description
