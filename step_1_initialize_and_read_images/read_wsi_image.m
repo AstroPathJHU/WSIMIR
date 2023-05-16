@@ -27,8 +27,18 @@ end
 path = fullfile(image_data.meta.image_names.folder,...
     image_data.meta.image_names.name);
 fprintf('Reading WSI %s \n', path);
+%
 tic
-image_data.image = imread(path, image_data.meta.level);
+%
+t = Tiff(path);
+if isTiled(t)
+    close(t)
+    image_data.image = read_big_tiff(path, image_data.meta.level);
+else
+    close(t)
+    fprintf('WARNING WSI is not in TILED format \n') ;
+    image_data.image = imread(path, image_data.meta.level);
+end
 %
 ss = size(image_data.image);
 image_data.meta.width = ss(2);

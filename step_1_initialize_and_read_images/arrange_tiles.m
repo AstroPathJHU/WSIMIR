@@ -59,8 +59,6 @@ for i2 = 1:length(image_data.meta.image_names)
    %
 end
 %
-clear images
-%
 image_data.image = bbim;
 image_data.meta.upperleftcorners = ul;
 %
@@ -71,7 +69,6 @@ image_data.meta.size = ss;
 image_data.meta.original_boundingbox = bb;
 image_data.meta.original_xcoord = [image_data.meta.image_names(:).x_coord];
 image_data.meta.original_ycoord = [image_data.meta.image_names(:).y_coord];
-
 %
 fprintf('           ');
 toc;

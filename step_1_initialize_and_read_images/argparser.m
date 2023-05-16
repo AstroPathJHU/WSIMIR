@@ -8,6 +8,7 @@ vars = varargin{1};
 %
 opts.nbands = 1;
 opts.numcores = 16;
+opts.numthreads = 2;
 opts.test = 0;
 opts.keep_moving_original = 0;
 opts.keep_moving_rotated = 0;
@@ -21,7 +22,6 @@ opts.run_step_1 = 0;
 opts.run_step_2 = 0;
 opts.run_step_3 = 0;
 opts.run_step_4 = 0;
-opts.return_points = 0;
 opts.output_dir = '';
 %
 opts.write_moving_image_tiles = 1;
