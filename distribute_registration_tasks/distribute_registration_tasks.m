@@ -30,11 +30,7 @@ number_of_worker_images = sort(histcounts(...
     input_reg_data.control_point_idx, meta.opts.numcores), 'desc')';
 unassigned_images_ii = true(length(input_reg_data.control_point_idx), 1);
 %
-profileName = parallel.defaultClusterProfile();
-meta.(opt).clust = parcluster(profileName);
-meta.(opt).clust.NumWorkers = meta.opts.numcores;
-meta.(opt).clust.NumThreads = 2;
-meta.(opt).job = createJob(meta.(opt).clust);
+meta = create_registration_cluster(meta, opt);
 %
 meta.(opt).image_groups = cell(meta.opts.numcores, 1);
 %
@@ -55,21 +51,15 @@ for jobnumber = 1:meta.opts.numcores
     %
 end
 %
-meta.(opt).image_groups = [meta.(opt).image_groups{:}];
-meta.(opt).number_of_worker_images = number_of_worker_images;
-%
 poolobj = gcp('nocreate');
 delete(poolobj);
+%
+meta.(opt).image_groups = [meta.(opt).image_groups{:}];
+meta.(opt).number_of_worker_images = number_of_worker_images;
 %
 fprintf(['Calculating ', replace(opt, '_', ' '), ' with ',...
     int2str(length(input_reg_data.control_point_idx)),' sample images \n'])
 %
-tic
-submit(meta.(opt).job);
-wait(meta.(opt).job); % need to add a timer and progress
-meta.(opt).output = fetchOutputs(meta.(opt).job);
-delete(meta.(opt).job);
-fprintf('           ');
-toc;
+meta = launch_registration_cluster(meta, opt);
 %
 end
