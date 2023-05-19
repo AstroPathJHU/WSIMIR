@@ -8,7 +8,7 @@ vars = varargin{1};
 %
 opts.nbands = 1;
 opts.numcores = 16;
-opts.numthreads = 2;
+opts.numthreads = 1;
 opts.test = 0;
 opts.keep_moving_original = 0;
 opts.keep_moving_rotated = 0;
