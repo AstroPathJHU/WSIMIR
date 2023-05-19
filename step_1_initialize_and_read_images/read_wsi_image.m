@@ -31,12 +31,14 @@ fprintf('Reading WSI %s \n', path);
 tic
 %
 t = Tiff(path);
-if isTiled(t)
-    close(t)
+setDirectory(t, image_data.meta.level)
+is_tiles_logical = isTiled(t);
+close(t)
+%
+if is_tiles_logical
     image_data.image = read_big_tiff(path, image_data.meta.level);
 else
-    close(t)
-    fprintf('WARNING WSI is not in TILED format \n') ;
+    fprintf('WARNING WSI is not in TILED format, may take longer to read\n') ;
     image_data.image = imread(path, image_data.meta.level);
 end
 %
