@@ -7,6 +7,11 @@ This code was designed based on a method to automated pathology whole slide regi
 
 In the processing, one of the images remains fixed and the other is rotated and transformed to the fixed image coordinates, we call these images fixed and moving images respectively. In this version of the code the fixed image must be a set of image tiles at 20x magnification where the tiles are named `<slideid>_*[<XCoord>, <YCoord>]*.tif`, replacing the `<slideid>`, `<XCoord>`, and `<YCoord>` with the repsective values.  We also assume that the moving image is an image pyramid where one of the layers is a 20x magnification image which is indicated in the image meta data 'ImageDescription' field. In theory our mutual information solution could be applied to all resolutions and images from any microscope, further development is ongoing in this space.
 
+Please use the following citation when referencing this work:
+
+<div align="center"> Doyle J*, Green BF*, Eminizer M, Jimenez-Sanchez D, Lu S, Engle EL, Xu H, Ogurtsova A, Lai J, Soto-Diaz S, Roskes JS, Deutsch JS, Taube JM, Sunshine JC*, Szalay AS*. Whole Slide Imaging, Mutual Information Registration (WSIMIR) For Multiplex Immunohistochemistry and Immunofluorescence. Lab Invest. 2023 May 15:100175. doi: 10.1016/j.labinv.2023.100175.</div> 
+<div align="center">* These authors contributed equally to this work.</div> 
+
 ## 2. Instructions
 
 Download \ checkout the repository. In MATLAB, add the folder to sourced directories. Use the command `wsimir` to start the code. `wsimir` inputs are added below.
