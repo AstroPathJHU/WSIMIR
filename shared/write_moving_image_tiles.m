@@ -29,7 +29,7 @@ tile_upper_bounds = tile_lower_bounds + meta.input_reg_data.tile_height - 1;
 tile_left_bounds = moving_image.final_grid_coordinates(:, 1);
 tile_right_bounds = tile_left_bounds + meta.input_reg_data.tile_width - 1;
 %
-parfor i1 = 1:length(final_coordinates)
+for i1 = 1:length(final_coordinates)
     %
    name_id = strsplit(fnames{i1}, ']_');
    full_filename = fullfile(tile_directory, [name_id{1}, ']_IHC.tif']);   
