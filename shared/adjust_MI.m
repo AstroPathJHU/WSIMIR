@@ -22,10 +22,10 @@ else
     %
     if strcmp(opt, 'rigid')
         coords = cast(coords, 'single') / scaling_factor + ...
-            search_region([3,1]);
+            double(search_region([3,1]));
     elseif strcmp(opt, 'initial_transformation')
         coords = double(coords) / scaling_factor + ...
-            search_region([3,1]);
+            double(search_region([3,1]));
     end
     %
 end
