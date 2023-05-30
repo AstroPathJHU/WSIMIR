@@ -12,7 +12,7 @@
 %   registration
 %% ------------------------
 function [coords, rotation_delta, MMI_map] = ...
-    get_rigid_registration(image_a, image_b, mi_vars)
+    get_rigid_registration(cropped_rescaled_moving, rescaled_fixed, mi_vars)
 %
 MMI_all = {};
 MMI_coords = {};
@@ -20,9 +20,9 @@ MMI_maps = {};
 %
 parfor i1 = 1:length(mi_vars.rotation_param)
     %
-    rotated_image_a = imrotate(image_a, mi_vars.rotation_param(i1));
+    rotated_image_a = imrotate(cropped_rescaled_moving, mi_vars.rotation_param(i1));
     [MMI_all{i1}, MMI_coords{i1}, MMI_maps{i1}] = get_NDJH_registration(...
-        rotated_image_a, image_b, mi_vars);
+        rotated_image_a, rescaled_fixed, mi_vars);
     %
 end
 %

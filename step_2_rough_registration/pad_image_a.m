@@ -11,26 +11,26 @@
 % image_info_b
 % bb
 %% ----------------------------------
-function [bb, coords, i1, image_info_a] = pad_image_a(...
-    scaling_factor, rotated_a, coords, image_info_b, bb, i1, image_info_a)
+function [bb, coords, i1, moving_image, rotated_moving] = pad_image_a(...
+    scaling_factor, rotated_moving, coords, fixed_image, bb, i1, moving_image)
 if coords(1) <= 1
-    [bb, coords, i1, image_info_a] = pad_image(...
-        scaling_factor, rotated_a, image_info_a, coords, 'pre', 'width');
+    [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
+        scaling_factor, moving_image, coords, 'pre', 'width');
 end
 %
-if coords(1) >= size(rotated_a, 2) - image_info_b.meta.width + 1
-    [bb, coords, i1, image_info_a] = pad_image(...
-        scaling_factor, rotated_a, image_info_a, coords, 'post', 'width');
+if coords(1) >= size(rotated_moving, 2) - fixed_image.meta.width + 1
+    [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
+        scaling_factor, moving_image, coords, 'post', 'width');
 end
 %
 if coords(2) <= 1
-    [bb, coords, i1, image_info_a] = pad_image(...
-        scaling_factor, rotated_a, image_info_a, coords, 'pre', 'height');
+    [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
+        scaling_factor, moving_image, coords, 'pre', 'height');
 end
 %
-if coords(2) >= size(rotated_a, 1) - image_info_b.meta.height + 1
-    [bb, coords, i1, image_info_a] = pad_image(...
-        scaling_factor, rotated_a, image_info_a, coords, 'post', 'height');
+if coords(2) >= size(rotated_moving, 1) - fixed_image.meta.height + 1
+    [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
+        scaling_factor, moving_image, coords, 'post', 'height');
 end
 %
 end
@@ -38,11 +38,11 @@ end
 %% Description
 % add padding to the image as needed
 %%
-function [bb, coords, i1, image_info_a] = pad_image(...
-    scaling_factor, rotated_a, image_info_a, coords, type_of_pad, side)
+function [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
+    scaling_factor, moving_image, coords, type_of_pad, side)
 %
 p = 1/scaling_factor;
-rotated_a = padarray(rotated_a, [0, p], 0, type_of_pad);
+moving_image.image = padarray(moving_image.image, [0, p], 0, type_of_pad);
 %
 if strcmp(side, 'width')
     coords(1) = p/2;
@@ -50,12 +50,14 @@ else
     coords(2) = p/2;
 end
 %
-warning('MIF registrered at edge of IHC image and the IHC image has been padded')
-image_info_a.Padding ={[0, p], 0, type_of_pad};
+warning('moving image registered at edge of fixed image and the moving image has been padded')
+moving_image.Padding ={[0, p], 0, type_of_pad};
 i1 = 1;
-bb(4) = size(rotated_a, 1);
-bb(3) = size(rotated_a, 2);
+bb(4) = size(moving_image.image, 1);
+bb(3) = size(moving_image.image, 2);
 bb(2) = 1;
 bb(1) = 1;
+%
+rotated_moving = moving_image.image;
 %
 end

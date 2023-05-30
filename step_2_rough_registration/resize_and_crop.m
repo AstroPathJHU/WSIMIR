@@ -11,7 +11,7 @@
 % - scaling_factor: the scaling factor for the resizing
 % - cropped_bound: the cropped boundaries
 function [rescaled_a_cropped, mi_vars] = resize_and_crop(...
-    image_a, image_b, bb, mi_vars)
+    rotated_moving, rescaled_fixed, bb, mi_vars)
 %
 mi_vars.search_region = [...
        bb(2) - mi_vars.cropped_bound(2),...
@@ -20,36 +20,36 @@ mi_vars.search_region = [...
        bb(3) + mi_vars.cropped_bound(1) - 1 ...
    ];
 %
-mi_vars.search_region = adjust_bounds(image_a, mi_vars.search_region);
+mi_vars.search_region = adjust_bounds(rotated_moving, mi_vars.search_region);
 %
 estimated_size = ceil(mi_vars.search_region * mi_vars.scaling_factor);
 %
-if estimated_size(2) <= size(image_b, 1)
+if estimated_size(2) <= size(rescaled_fixed, 1)
     mi_vars.search_region(1) = ...
         bb(2) - mi_vars.cropped_bound(2) - 1 / mi_vars.scaling_factor;
     mi_vars.search_region(2) = ...
         bb(4) + mi_vars.cropped_bound(2) - 1 + 1 / mi_vars.scaling_factor;
 end
 %
-if estimated_size(4) <= size(image_b, 2)
+if estimated_size(4) <= size(rescaled_fixed, 2)
     mi_vars.search_region(3) = ...
         bb(1) - mi_vars.cropped_bound(1) - 1 / mi_vars.scaling_factor;
     mi_vars.search_region(4) = ...
         bb(3) + mi_vars.cropped_bound(1) - 1 + 1 / mi_vars.scaling_factor;
 end
 %
-mi_vars.search_region = adjust_bounds(image_a, mi_vars.search_region);
+mi_vars.search_region = adjust_bounds(rotated_moving, mi_vars.search_region);
 %
-rescaled_a_cropped = imresize(image_a(...
+rescaled_a_cropped = imresize(rotated_moving(...
        mi_vars.search_region(1):mi_vars.search_region(2),...
        mi_vars.search_region(3):mi_vars.search_region(4),...
        1), mi_vars.scaling_factor);
 %
 end
 %%
-function search_region = adjust_bounds(image_a, search_region)
+function search_region = adjust_bounds(rotated_moving, search_region)
 %
-a_size = size(image_a);
+a_size = size(rotated_moving);
 %
 search_region(search_region < 1) = 1;
 search_region = adjust_bound(a_size(1), search_region, 2);
