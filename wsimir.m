@@ -59,7 +59,7 @@ end
 [moving_image, fixed_image, meta] = ...
     get_affine_transformation(moving_image, fixed_image, meta);
 %
-if ~meta.write_moving_image_tiles
+if ~meta.opts.write_moving_image_tiles
     %
     if ~meta.opts.keep_moving_initial_transformed
         moving_image = rmfield(moving_image, 'initial_transformed_image');
