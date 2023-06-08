@@ -46,8 +46,9 @@ end
 if isfield(mi_vars,'parallel')
     %
     MMI2 = num2cell(MMI2);
+    s = size(mi_vars.global_search_grids);
     %
-    parfor correction = 1:length(mi_vars.global_search_grids)
+    parfor correction = 1:s(1)
         %
         sliced_image_a = image_a(...
             mi_vars.global_search_grids(correction, 2):...
@@ -67,7 +68,9 @@ if isfield(mi_vars,'parallel')
     %
 else
     %
-    for correction = 1:length(mi_vars.global_search_grids)
+    s = size(mi_vars.global_search_grids);
+    %
+    for correction = 1:s(1)
        %
         sliced_image_a = image_a(...
             mi_vars.global_search_grids(correction, 2):...
