@@ -13,61 +13,43 @@
  moving_image_path = '\\bki04\Clinical_Specimen\M21_1\IHC\M21_1.tif';
  fixed_image_path = ...
  '\\bki04\Clinical_Specimen\M21_1\inform_data\Component_Tiffs';
- [moving_image, fixed_image, meta] = ...
+ [fixed_image, moving_image, meta] = ...
 wsimir(fixed_image_path, moving_image_path, 'test', 1)
 %}
 %% ----------------------------------
-function [moving_image, fixed_image, meta] = ...
+function [fixed_image, moving_image, meta] = ...
     wsimir(fixed_image_path, moving_image_path, varargin)
 %%
-meta = argparser(moving_image_path, varargin);
+[fixed_image, moving_image, meta] = argparser(...
+    fixed_image_path, moving_image_path, varargin);
 %
-moving_image.meta.path = moving_image_path;
-fixed_image.meta.path = fixed_image_path;
+if meta.opts.test; return; end
 %
-if meta.opts.test
-    return
-end
+% Define corresponding functions for each step
 %
-if ~meta.opts.run_step_1
-    return
-end
+steps = {
+    @get_images;
+    @get_rough_registration;
+    @get_initial_transformation;
+    @get_affine_transformation;
+    @write_moving_image_tiles
+};
 %
-meta = startpar(meta);
+% Iterate over steps sequentially
 %
-[moving_image, fixed_image] = get_images(...
-    moving_image, fixed_image, meta);
-%
-if ~meta.opts.run_step_2
-    return
-end
-%
-[moving_image, fixed_image, meta] = ...
-    get_rough_registration(moving_image, fixed_image, meta);
-%
-if ~meta.opts.run_step_3
-    return
-end
-%
-[moving_image, fixed_image, meta] = ...
-    get_initial_transformation(moving_image, fixed_image, meta);
-%
-if ~meta.opts.run_step_4
-    return
-end
-%
-[moving_image, fixed_image, meta] = ...
-    get_affine_transformation(moving_image, fixed_image, meta);
-%
-if ~meta.opts.write_moving_image_tiles
-    %
-    if ~meta.opts.keep_moving_initial_transformed
-        moving_image = rmfield(moving_image, 'initial_transformed_image');
+for step_idx = 1:length(steps)
+    if ~meta.opts.(['run_step_', num2str(step_idx)])
+        break
     end
-    %
-    return
+    [fixed_image, moving_image, meta] = ...
+        steps{step_idx}(fixed_image, moving_image, meta);
 end
 %
-moving_image = write_moving_image_tiles(moving_image, meta);
+if ~meta.opts.keep_step_1 && meta.opts.show_any
+    fixed_image = rmfield(fixed_image, 'image');
+end
+%
+msg = 'Whole Slide Imaging, Mutual Information Registration';
+logger(msg, 'FINISHED', meta)
 %
 end

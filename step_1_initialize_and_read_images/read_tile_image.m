@@ -11,8 +11,8 @@
 %% Output
 % TILE type images will have the "image" field populated with an image
 %% ----------------------------------
-function [moving_image, fixed_image] =...
-    read_tile_image(moving_image, fixed_image, meta)
+function [fixed_image, moving_image] = ...
+    read_tile_image(fixed_image, moving_image, meta)
 %
 if strcmp(moving_image.meta.type, 'TILE')
     %    

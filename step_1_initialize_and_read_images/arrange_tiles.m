@@ -19,7 +19,8 @@ names = {image_data.meta.image_names(:).name};
 levels = image_data.meta.ncomponents;
 nbands = meta.opts.nbands;
 %
-fprintf('Reading TILE image %s \n', folders{1});
+msg = ['Reading TILE image ', folders{1}];
+logger(msg, 'INFO', meta)
 tic
 %
 % read the images in
@@ -70,7 +71,6 @@ image_data.meta.original_boundingbox = bb;
 image_data.meta.original_xcoord = [image_data.meta.image_names(:).x_coord];
 image_data.meta.original_ycoord = [image_data.meta.image_names(:).y_coord];
 %
-fprintf('           ');
-toc;
+logger(strcat("Elapsed time: ", string(toc)), 'INFO', meta)
 %
 end

@@ -12,25 +12,25 @@
 % bb
 %% ----------------------------------
 function [bb, coords, i1, moving_image, rotated_moving] = pad_image_a(...
-    scaling_factor, rotated_moving, coords, fixed_image, bb, i1, moving_image)
+    scaling_factor, rotated_moving, coords, fixed_image, bb, i1, moving_image, meta)
 if coords(1) <= 1
     [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
-        scaling_factor, moving_image, coords, 'pre', 'width');
+        scaling_factor, moving_image, coords, 'pre', 'width', meta);
 end
 %
 if coords(1) >= size(rotated_moving, 2) - fixed_image.meta.width + 1
     [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
-        scaling_factor, moving_image, coords, 'post', 'width');
+        scaling_factor, moving_image, coords, 'post', 'width', meta);
 end
 %
 if coords(2) <= 1
     [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
-        scaling_factor, moving_image, coords, 'pre', 'height');
+        scaling_factor, moving_image, coords, 'pre', 'height', meta);
 end
 %
 if coords(2) >= size(rotated_moving, 1) - fixed_image.meta.height + 1
     [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
-        scaling_factor, moving_image, coords, 'post', 'height');
+        scaling_factor, moving_image, coords, 'post', 'height', meta);
 end
 %
 end
@@ -39,7 +39,7 @@ end
 % add padding to the image as needed
 %%
 function [bb, coords, i1, moving_image, rotated_moving] = pad_image(...
-    scaling_factor, moving_image, coords, type_of_pad, side)
+    scaling_factor, moving_image, coords, type_of_pad, side, meta)
 %
 p = 1/scaling_factor;
 moving_image.image = padarray(moving_image.image, [0, p], 0, type_of_pad);
@@ -50,7 +50,10 @@ else
     coords(2) = p/2;
 end
 %
-warning('moving image registered at edge of fixed image and the moving image has been padded')
+msg = ['Moving image registered at edge of fixed image ', ...
+    'and the moving image has been padded'];
+logger(msg, 'WARN', meta)
+%
 moving_image.Padding ={[0, p], 0, type_of_pad};
 i1 = 1;
 bb(4) = size(moving_image.image, 1);

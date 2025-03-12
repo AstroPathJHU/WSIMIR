@@ -1,9 +1,8 @@
 %% create_cluster_regions
 %
 %%
-function [image_group, moving_image_clip] = ...
-    create_cluster_regions(moving_image, fixed_image,...
-    input_reg_data, image_group, opt)
+function [image_group, moving_image_clip] = create_cluster_regions( ...
+    fixed_image, moving_image, input_reg_data, image_group, opt)
 %
 if ~isempty(image_group.bb)
     %

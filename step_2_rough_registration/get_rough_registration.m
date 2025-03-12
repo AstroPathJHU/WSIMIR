@@ -14,8 +14,11 @@
 % image_info_a: the image info struct with rotated image a added in
 % image_info_b: the image info object of b
 %% -----------------------
-function [moving_image, fixed_image, meta] = ...
-    get_rough_registration(moving_image, fixed_image, meta)
+function [fixed_image, moving_image, meta] = ...
+    get_rough_registration(fixed_image, moving_image, meta)
+%
+meta.opts.step = 2;
+logger('Setting up coarse registration', 'INFO', meta)
 %
 % rotation loop parameters
 %
@@ -56,12 +59,13 @@ while resolution_step <= n_steps
    rescaled_fixed = imresize(...
        fixed_image.image(:,:,1), mi_vars.scaling_factor);
    [cropped_rescaled_moving, mi_vars] = resize_and_crop(...
-       rotated_moving, rescaled_fixed, bb, mi_vars);
+       rotated_moving, rescaled_fixed, bb, mi_vars, meta);
    %
    % get the initial coarse registration
    %
-   fprintf('Calculating initial coarse registration step %d of %d \n', ...
-        resolution_step, n_steps);
+   msg = strcat("Calculating initial coarse registration step ", ...
+       string(resolution_step), " of ", string(n_steps));
+   logger(msg, 'INFO', meta)
    [coords, rotation_delta, MMI_maps{resolution_step}] = ...
        get_rigid_registration(...
        cropped_rescaled_moving, rescaled_fixed, mi_vars);
@@ -81,10 +85,11 @@ while resolution_step <= n_steps
        pad_image_a(mi_vars.scaling_factor, rotated_moving, coords,...
        fixed_image, bb, resolution_step, moving_image);
    %
-   fprintf('           ');
-   toc;
+   logger(strcat("Elapsed time: ", string(toc)), 'INFO', meta)
    %
 end
+%
+logger('Saving coarse registration parameters', 'INFO', meta)
 %
 moving_image.rotated_image = rotated_moving;
 moving_image.meta.rotated_boundingbox = bb;
@@ -96,17 +101,15 @@ meta.rough_registration_output.rotation_correction = rotation_correction;
 meta.initial_transformation.input_reg_data.moving_image_size = ...
     size(moving_image.rotated_image);
 %
-if ~meta.opts.keep_all_fixed
+if ~meta.opts.keep_step_1 && ~meta.opts.show_any
     fixed_image = rmfield(fixed_image, 'image');
 end
 %
-if ~meta.opts.keep_moving_original
+if ~meta.opts.keep_step_1
     moving_image = rmfield(moving_image, 'image');
 end
 %
-if meta.opts.write_step2_rotated_moving_image_wsi
-    ipath = fullfile(meta.opts.output_dir, meta.opts.step2_out_filename);
-    imwrite(moving_image.rotated_image, ipath)
-end
+write_image(moving_image.rotated_image, meta)
+show_images(fixed_image, moving_image, {'image', 'rotated_image'}, meta)
 %
 end

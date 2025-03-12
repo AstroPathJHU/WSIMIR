@@ -20,7 +20,7 @@
 % opt: initial_transformation or affine_transformation
 %% ----------------------------------
 function [fixed_image, meta] = ...
-    distribute_registration_tasks(moving_image, fixed_image, meta, opt)
+    distribute_registration_tasks(fixed_image, moving_image, meta, opt)
 %
 input_reg_data = mergestructs(...
     meta.(opt).input_reg_data, meta.input_reg_data);
@@ -41,11 +41,10 @@ for jobnumber = 1:meta.opts.numcores
         number_of_worker_images(jobnumber), input_reg_data);
     %
     [image_group, moving_image_clip] = create_cluster_regions(...
-        moving_image, fixed_image, input_reg_data, image_group, opt);
+        fixed_image, moving_image, input_reg_data, image_group, opt);
     %
-    meta = create_registration_tasks(...
-        meta, image_group, moving_image_clip,...
-        input_reg_data, opt, jobnumber);
+    meta = create_registration_tasks(meta, image_group, ...
+        moving_image_clip, input_reg_data, opt, jobnumber);
     %
     meta.(opt).image_groups{jobnumber} = image_group;
     %
@@ -57,8 +56,10 @@ delete(poolobj);
 meta.(opt).image_groups = [meta.(opt).image_groups{:}];
 meta.(opt).number_of_worker_images = number_of_worker_images;
 %
-fprintf(['Calculating ', replace(opt, '_', ' '), ' with ',...
-    int2str(length(input_reg_data.control_point_idx)),' sample images \n'])
+msg =['Calculating ', replace(opt, '_', ' '), ' with ',...
+    int2str(length(input_reg_data.control_point_idx)),' sample images'];
+logger(msg, 'INFO', meta)
+logger("This step may take a few minutes...please wait", 'INFO', meta)
 %
 meta = launch_registration_cluster(meta, opt);
 %

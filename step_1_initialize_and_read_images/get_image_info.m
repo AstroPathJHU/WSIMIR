@@ -13,13 +13,14 @@
 %% Input
 % mpath: folder or file path
 %% ----------------------------------
-function out_struct = get_image_info(mpath)
+function out_struct = get_image_info(mpath, meta)
 
 isfolderm = isfolder(mpath);
 %
 if ~isfolderm
     if ~exist(mpath, 'file')
-        error([mpath, ' could not be found'])
+        msg = [mpath, ' could not be found'];
+        logger(msg, 'ERROR', meta)
     end
     %
     image_info = imfinfo(mpath);
@@ -30,8 +31,9 @@ if ~isfolderm
         if level
             image_info = image_info(level);
         else 
-            error(['image has more than one layer and correct layer',...
-                ' correct layer cannot be identified ',mpath]) 
+            msg = ['image has more than one layer and correct layer',...
+                ' correct layer cannot be identified ', mpath];
+            logger(msg, 'ERROR', meta)
         end
     else 
         level = 1;
@@ -47,7 +49,7 @@ else
     if isempty(image_names)
         msg = ['path was a directory, image tiles in the Akoya format',...
             'were expected but not found: ', mpath];
-        error(msg)
+        logger(msg, 'ERROR', meta)
     end
     %
     image_info = imfinfo(fullfile(...

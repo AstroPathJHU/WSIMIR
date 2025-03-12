@@ -9,16 +9,16 @@
 %% Output
 % WSI type images will have the "image" field populated with an image
 %% ----------------------------------
-function [moving_image, fixed_image] =...
-    read_wsi_image(moving_image, fixed_image)
+function [fixed_image, moving_image] = ...
+    read_wsi_image(fixed_image, moving_image, meta)
 %
-moving_image = open_wsi(moving_image);
-fixed_image = open_wsi(fixed_image);
+moving_image = open_wsi(moving_image, meta);
+fixed_image = open_wsi(fixed_image, meta);
 %
 end
 %% open_wsi
 %
-function image_data = open_wsi(image_data)
+function image_data = open_wsi(image_data, meta)
 %
 if ~strcmp(image_data.meta.type, 'WSI')
     return
@@ -26,7 +26,7 @@ end
 %
 path = fullfile(image_data.meta.image_names.folder,...
     image_data.meta.image_names.name);
-fprintf('Reading WSI %s \n', path);
+logger(['Reading WSI at ', path], 'INFO', meta)
 %
 tic
 %
@@ -38,7 +38,8 @@ close(t)
 if is_tiles_logical
     image_data.image = read_big_tiff(path, image_data.meta.level);
 else
-    fprintf('WARNING WSI is not in TILED format, may take longer to read\n') ;
+    msg = 'WARNING WSI is not in TILED format, may take longer to read';
+    logger(msg, 'WARN', meta)
     image_data.image = imread(path, image_data.meta.level);
 end
 %
@@ -47,7 +48,6 @@ image_data.meta.width = ss(2);
 image_data.meta.height = ss(1);
 image_data.meta.size = ss;
 %
-fprintf('           ');
-toc;
+logger(strcat("Elapsed time: ", string(toc)), 'INFO', meta)
 %
 end 

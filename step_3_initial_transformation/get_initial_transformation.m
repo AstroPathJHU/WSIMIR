@@ -16,15 +16,17 @@
 % will delete the rotated_image if specified by input opts (default)
 % meta: metadata with added initial_transformation struct 
 %% --------------------------
-function [moving_image, fixed_image, meta] = get_initial_transformation(...
-    moving_image, fixed_image, meta)
+function [fixed_image, moving_image, meta] = get_initial_transformation(...
+    fixed_image, moving_image, meta)
 %
-[fixed_image, meta] = get_search_grids(moving_image, fixed_image, meta);
+meta.opts.step = 3;
+%
+[fixed_image, meta] = get_search_grids(fixed_image, moving_image, meta);
 %
 [fixed_image, meta] = distribute_registration_tasks(...
-    moving_image, fixed_image, meta, 'initial_transformation');
+    fixed_image, moving_image, meta, 'initial_transformation');
 %
 [moving_image, meta] = ...
-    calculate_and_apply_initial_transform(moving_image, fixed_image, meta);
+    calculate_and_apply_initial_transform(fixed_image, moving_image, meta);
 %
 end

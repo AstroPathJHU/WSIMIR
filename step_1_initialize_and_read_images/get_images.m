@@ -15,14 +15,22 @@
 % nbands: number of component layers to read in for the stiching with
 % a default of 1
 %% ----------------------------------
-function [moving_image, fixed_image] = get_images(moving_image, fixed_image, meta)
+function [fixed_image, moving_image, meta] = ...
+    get_images(fixed_image, moving_image, meta)
 %
-moving_image.meta = get_image_info(moving_image.meta.path);
-fixed_image.meta = get_image_info(fixed_image.meta.path);
+meta.opts.step = 1;
+startpar(meta);
 %
-[moving_image, fixed_image] = read_wsi_image(moving_image, fixed_image);
-[moving_image, fixed_image] = read_tile_image(...
-    moving_image, fixed_image, meta);
+moving_image.meta = get_image_info(moving_image.meta.path, meta);
+fixed_image.meta = get_image_info(fixed_image.meta.path, meta);
+%
+[fixed_image, moving_image] = read_wsi_image(...
+    fixed_image, moving_image, meta);
+[fixed_image, moving_image] = read_tile_image(...
+   fixed_image, moving_image, meta);
+%
+msg = 'Rescaling moving image to fixed image scale';
+logger(msg, 'INFO', meta)
 %
 % resize moving image to the fixed image scaling scaling. 
 % just replaces the image object in moving_image.image
@@ -38,6 +46,8 @@ moving_image.meta.original_width = moving_image.meta.width;
 moving_image.meta.size = size(moving_image.image);
 moving_image.meta.height = moving_image.meta.size(1);
 moving_image.meta.width = moving_image.meta.size(2);
+%
+show_images(fixed_image, moving_image, {'image', 'image'}, meta)
 %
 end
 %

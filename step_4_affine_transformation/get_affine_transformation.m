@@ -16,15 +16,17 @@
 % by input opts (default)
 % meta: metadata with added affine_transformation struct 
 %% --------------------------
-function [moving_image, fixed_image, meta] = ...
-    get_affine_transformation(moving_image, fixed_image, meta)
+function [fixed_image, moving_image, meta] = ...
+    get_affine_transformation(fixed_image, moving_image, meta)
+%
+meta.opts.step = 4;
 %
 meta = initialize_affine_transformation_parameters(meta, moving_image);
 %
-[fixed_image, meta] = distribute_registration_tasks(...
-    moving_image, fixed_image, meta, 'affine_transformation');
+[fixed_image, meta] = distribute_registration_tasks( ...
+    fixed_image, moving_image, meta, 'affine_transformation');
 %
-[moving_image, meta] = ...
-    calculate_and_apply_affine_transform(moving_image, fixed_image, meta);
+[moving_image, meta] = calculate_and_apply_affine_transform( ...
+    fixed_image, moving_image, meta);
 %
 end

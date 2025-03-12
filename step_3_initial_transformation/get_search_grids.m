@@ -17,10 +17,12 @@
 %% -------------------------
 %
 function [fixed_image, meta] = get_search_grids(...
-    moving_image, fixed_image, meta)
+    fixed_image, moving_image, meta)
 %
 % if the fixed image is a TILE image then use the coordinates
 % for the grid but adjust to the rotated image upper left hand corner
+%
+logger('Building search grids', 'INFO', meta)
 %
 if strcmp(fixed_image.meta.type, 'TILE')
     %
@@ -44,13 +46,15 @@ elseif strcmp(moving_image.type, 'TILE')
    %
    % need to use the image info a type grid
    %
-   stop('image b is not a TILE image but image a is this is not yet supported')
+   msg = 'NOT IMPLEMENTED - image b is not a TILE image but image a is';
+   logger(msg, 'ERROR', meta)
    %
 else
     %
     % need to create a grid
     %
-    stop('image a nor image b is a TILE image this is not yet supported')
+    msg = 'NOT IMPLEMENTED - image a nor image b is a TILE image';
+    logger(msg, 'ERROR', meta)
     %
 end
 %

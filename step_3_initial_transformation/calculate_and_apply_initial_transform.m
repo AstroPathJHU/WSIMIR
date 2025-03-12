@@ -15,7 +15,9 @@
 % contain 'T'
 %%
 function [moving_image, meta] = ...
-    calculate_and_apply_initial_transform(moving_image, fixed_image, meta)
+    calculate_and_apply_initial_transform(fixed_image, moving_image, meta)
+%
+logger('Applying estimated initial transform', 'INFO', meta)
 %
 meta.initial_transformation.output = [meta.initial_transformation.output{:}];
 [~,index] = sortrows([meta.initial_transformation.output.control_point_idx].');
@@ -76,13 +78,14 @@ new_high_confidence_control_pts = new_coordinates(...
     calculate_and_apply_transform(old_high_confidence_control_pts, ...
     new_high_confidence_control_pts, moving_image.rotated_image);
 %
-if ~meta.opts.keep_moving_rotated
+if ~meta.opts.keep_step_2
     moving_image = rmfield(moving_image, 'rotated_image');
 end
 %
-if meta.opts.write_step3_initial_transformed_moving_image_wsi
-    ipath = fullfile(meta.opts.output_dir, meta.opts.step3_out_filename);
-    imwrite(moving_image.initial_transformed_image, ipath)
-end
+write_image(moving_image.initial_transformed_image, meta)
+show_images(fixed_image, moving_image, ...
+    {'image', 'initial_transformed_image'}, meta)
+%
+logger('Finished applying estimated initial transform', 'INFO', meta)
 %
 end
