@@ -36,9 +36,17 @@ is_tiles_logical = isTiled(t);
 close(t)
 %
 if is_tiles_logical
-    image_data.image = read_big_tiff(path, image_data.meta.level);
+    try
+        image_data.image = read_big_tiff(path, image_data.meta.level);
+    catch err
+       input_err.message = ['Could not read image, the image ', path, ...
+           ' may be corrupt'];
+       input_err.stack = err.stack;
+       input_err.identifier = err.identifier;
+       logger(input_err, 'ERROR', meta)
+    end
 else
-    msg = 'WARNING WSI is not in TILED format, may take longer to read';
+    msg = 'WSI is not in TILED format, will take longer to read';
     logger(msg, 'WARN', meta)
     image_data.image = imread(path, image_data.meta.level);
 end

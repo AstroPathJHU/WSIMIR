@@ -17,7 +17,6 @@
 function [fixed_image, moving_image, meta] = ...
     get_rough_registration(fixed_image, moving_image, meta)
 %
-meta.opts.step = 2;
 logger('Setting up coarse registration', 'INFO', meta)
 %
 % rotation loop parameters
@@ -59,7 +58,7 @@ while resolution_step <= n_steps
    rescaled_fixed = imresize(...
        fixed_image.image(:,:,1), mi_vars.scaling_factor);
    [cropped_rescaled_moving, mi_vars] = resize_and_crop(...
-       rotated_moving, rescaled_fixed, bb, mi_vars, meta);
+       rotated_moving, rescaled_fixed, bb, mi_vars);
    %
    % get the initial coarse registration
    %
@@ -67,8 +66,7 @@ while resolution_step <= n_steps
        string(resolution_step), " of ", string(n_steps));
    logger(msg, 'INFO', meta)
    [coords, rotation_delta, MMI_maps{resolution_step}] = ...
-       get_rigid_registration(...
-       cropped_rescaled_moving, rescaled_fixed, mi_vars);
+       get_rigid_registration(cropped_rescaled_moving, rescaled_fixed, mi_vars);
    %
    % edit moving variables
    %
@@ -83,7 +81,7 @@ while resolution_step <= n_steps
    %
    [bb, coords, resolution_step, moving_image, rotated_moving] = ...
        pad_image_a(mi_vars.scaling_factor, rotated_moving, coords,...
-       fixed_image, bb, resolution_step, moving_image);
+       fixed_image, bb, resolution_step, moving_image, meta);
    %
    logger(strcat("Elapsed time: ", string(toc)), 'INFO', meta)
    %
@@ -101,7 +99,7 @@ meta.rough_registration_output.rotation_correction = rotation_correction;
 meta.initial_transformation.input_reg_data.moving_image_size = ...
     size(moving_image.rotated_image);
 %
-if ~meta.opts.keep_step_1 && ~meta.opts.show_any
+if ~(meta.opts.keep_step_1 || meta.opts.show_any || meta.opts.save_overlay_any)
     fixed_image = rmfield(fixed_image, 'image');
 end
 %

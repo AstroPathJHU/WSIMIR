@@ -4,23 +4,40 @@
 %%
 function show_images(image_1, image_2, image_ids, meta)
 %
-if ~meta.opts.(['show_step_', num2str(meta.opts.step)])
+if ~(meta.opts.(['show_step_', num2str(meta.opts.step)]) || ...
+        meta.opts.(['save_overlay_step_', num2str(meta.opts.step)]))
     return
 end
 %
 msg = strcat("Displaying images: fixed ", image_ids{1}, ...
-    " (Top/R) - moving ", image_ids{2}, " (Middle/B)");
+    " (Left/R) - moving ", image_ids{2}, " (Right/B)");
 logger(msg, 'INFO', meta)
 %
-figure( 'Position', [10 10 900 600]);
+if meta.opts.(['show_step_', num2str(meta.opts.step)])
+    showme = 'on';
+else
+    showme = 'off';
+end
 %
-subplot(3,1,1);
+XX = figure('visible' , showme);
+set(gcf, 'units','normalized','outerposition',[0 0 1 1],...
+    'PaperUnits','inches');
+XX.PaperPositionMode = 'auto';
+%
+positions = [ ...
+    -.07 0.51 0.65 0.45; ...
+    0.42 0.51 0.65 0.45; ...
+    0.175 0.02 0.65 0.45];
+%
+p1 = axes('Position', positions(1, :));
 im1 = prepare_display_image(image_1, image_ids{1});
 imshow(im1)
+title(p1, strcat("Fixed ", image_ids{1}))
 %
-subplot(3,1,2);
+p2 = axes('Position', positions(2, :));
 im2 = prepare_display_image(image_2, image_ids{2});
 imshow(im2)
+title(p2, strcat("Moving ", replace(image_ids{2}, '_', ' ')))
 %
 im1 = convert_rgb2_gray(im1);
 im2 = convert_rgb2_gray(im2);
@@ -29,10 +46,27 @@ im3 = zeros(1000, 2000, 3);
 im3(:, :, 1) = .75 * im1;
 im3(:, :, 3) = .75 * im2;
 %
-subplot(3,1,3);
+p3 = axes('Position', positions(3, :));
 imshow(uint8(im3))
+title(p3, strcat("Overlay of Fixed ", image_ids{1}, " (Red) and Moving ", ...
+    replace(image_ids{2}, '_', ' '), " (Blue)"))
 %
-shg
+if meta.opts.(['save_overlay_step_', num2str(meta.opts.step)])
+    %
+    if ~isfolder(meta.opts.output_fullimage_path)
+        mkdir(meta.opts.output_fullimage_path)
+    end
+    %
+    impath = fullfile(meta.opts.output_fullimage_path,...
+        meta.opts.(['output_filename_step_', num2str(meta.opts.step)]));
+    impath = replace(replace(impath, "_moving", ""), ".tif", "_overlay.tif");        
+    print(XX, impath, '-dtiff', '-r0')
+    %
+end
+%
+if ~meta.opts.show_any
+    close all
+end
 %
 end
 

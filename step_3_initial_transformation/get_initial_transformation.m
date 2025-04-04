@@ -19,8 +19,6 @@
 function [fixed_image, moving_image, meta] = get_initial_transformation(...
     fixed_image, moving_image, meta)
 %
-meta.opts.step = 3;
-%
 [fixed_image, meta] = get_search_grids(fixed_image, moving_image, meta);
 %
 [fixed_image, meta] = distribute_registration_tasks(...

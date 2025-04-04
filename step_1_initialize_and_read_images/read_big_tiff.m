@@ -16,6 +16,8 @@ im2 = cell(tiles_long, 1);
 %
 parfor i2 = 1:tiles_long
     %
+    warning('error', 'imageio:tiffmexutils:libtiffErrorAsWarning');
+    %
     im2{i2} = open_tiled_tiff_strip(...
         imname, i2, tile_length, tile_width, tiles_wide, level);
     %

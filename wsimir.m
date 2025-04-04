@@ -31,7 +31,7 @@ steps = {
     @get_images;
     @get_rough_registration;
     @get_initial_transformation;
-    @get_affine_transformation;
+    @get_high_res_transformation;
     @write_moving_image_tiles
 };
 %
@@ -41,15 +41,23 @@ for step_idx = 1:length(steps)
     if ~meta.opts.(['run_step_', num2str(step_idx)])
         break
     end
+    %
+    meta.opts.step = step_idx;
+    logger(meta.opts.step_names(step_idx+1), 'START', meta)
     [fixed_image, moving_image, meta] = ...
-        steps{step_idx}(fixed_image, moving_image, meta);
+        meta.opts.steps{step_idx}(fixed_image, moving_image, meta);
+    logger(meta.opts.step_names(step_idx+1), 'FINISH', meta)
+    %
 end
 %
-if ~meta.opts.keep_step_1 && meta.opts.show_any
+meta.opts.step = 6;
+%
+if ~meta.opts.keep_step_1 && ...
+        (meta.opts.show_any || meta.opts.save_overlay_any)
     fixed_image = rmfield(fixed_image, 'image');
 end
 %
 msg = 'Whole Slide Imaging, Mutual Information Registration';
-logger(msg, 'FINISHED', meta)
+logger(msg, 'FINISH', meta)
 %
 end

@@ -22,7 +22,7 @@ function [fixed_image, meta] = get_search_grids(...
 % if the fixed image is a TILE image then use the coordinates
 % for the grid but adjust to the rotated image upper left hand corner
 %
-logger('Building search grids', 'INFO', meta)
+logger('Building initial search grids', 'INFO', meta)
 %
 if strcmp(fixed_image.meta.type, 'TILE')
     %

@@ -31,7 +31,7 @@ if ~isfolderm
         if level
             image_info = image_info(level);
         else 
-            msg = ['image has more than one layer and correct layer',...
+            msg = ['Image has more than one layer and correct layer',...
                 ' correct layer cannot be identified ', mpath];
             logger(msg, 'ERROR', meta)
         end
@@ -47,7 +47,7 @@ else
     image_names = dir(fullfile(mpath, '*component_data.tif'));
     %
     if isempty(image_names)
-        msg = ['path was a directory, image tiles in the Akoya format',...
+        msg = ['Path was a directory, image tiles in the Akoya format',...
             'were expected but not found: ', mpath];
         logger(msg, 'ERROR', meta)
     end

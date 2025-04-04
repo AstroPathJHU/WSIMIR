@@ -1,4 +1,4 @@
-%% get_affine_transformation
+%% get_high_res_transformation
 %
 %% Description
 % Divide the image into the gridded parts and distribute
@@ -12,21 +12,19 @@
 % meta: the metadata object output from @get_intial_transformation
 %% Output
 % moving_image: the moving_image struct, if specified in opts, with final 
-% affine_transformed_image. will delete the transformed_image if specified 
+% high_res_transformed_image. will delete the transformed_image if specified 
 % by input opts (default)
-% meta: metadata with added affine_transformation struct 
+% meta: metadata with added high_res_transformation struct 
 %% --------------------------
 function [fixed_image, moving_image, meta] = ...
-    get_affine_transformation(fixed_image, moving_image, meta)
+    get_high_res_transformation(fixed_image, moving_image, meta)
 %
-meta.opts.step = 4;
-%
-meta = initialize_affine_transformation_parameters(meta, moving_image);
+meta = initialize_high_res_transformation_parameters(moving_image, meta);
 %
 [fixed_image, meta] = distribute_registration_tasks( ...
-    fixed_image, moving_image, meta, 'affine_transformation');
+    fixed_image, moving_image, meta, 'high_res_transformation');
 %
-[moving_image, meta] = calculate_and_apply_affine_transform( ...
+[moving_image, meta] = calculate_and_apply_high_res_transform( ...
     fixed_image, moving_image, meta);
 %
 end

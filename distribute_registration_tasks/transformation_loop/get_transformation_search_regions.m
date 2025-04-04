@@ -18,7 +18,7 @@ search_region(4) = current_fixed_image.coordinates(1) + ...
 %
 search_region = uint32(search_region);
 %
-if strcmp(input_reg_data.opt, 'affine_transformation')
+if strcmp(input_reg_data.opt, 'high_res_transformation')
     %
     search_region([2,4]) = search_region([2,4]) - 1;
     %

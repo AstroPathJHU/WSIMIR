@@ -18,7 +18,6 @@
 function [fixed_image, moving_image, meta] = ...
     get_images(fixed_image, moving_image, meta)
 %
-meta.opts.step = 1;
 startpar(meta);
 %
 moving_image.meta = get_image_info(moving_image.meta.path, meta);

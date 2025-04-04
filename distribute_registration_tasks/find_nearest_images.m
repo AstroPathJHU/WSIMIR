@@ -47,7 +47,7 @@ image_group.bb = ...
     max(fixed_image.meta.relative_ul_corners(...
     image_group.control_point_idx, :), [], 1)];
 %
-if strcmp(input_reg_data.opt, 'affine_transformation')
+if strcmp(input_reg_data.opt, 'high_res_transformation')
     image_group.bb = image_group.bb + 1;
 end
 %

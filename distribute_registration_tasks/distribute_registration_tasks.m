@@ -1,26 +1,29 @@
 %% distribute_registration_tasks
 %% Description
-% create and launch parallel registration tasks for the initial or affine
+% create and launch parallel registration tasks for the initial or high res
 % transformations. In doing so, work is dividied for parallelization and we
 % isolate regions of the moving image and the corresponding fixed image so
 % that we don't have to send the entire image to all workers. 
 %
-% note that we define two types of transformations: the initial and affine.
+% note that we define two types of transformations: the initial and high res.
 % For the initial transformation we use a search boarder of 1/2 the grid
 % size and control points from the grids for registration both defined by 
-% get_search_grids. For the affine transformation we use all grids (or
-% tiles) for registration. 
+% get_search_grids. For the high resolution transformation we use all grids
+% (or tiles) for registration. 
 %
 %% Input
 % moving_image: moving_image struct output from @get_rough_registration
 % fixed_image: fixed_image struct output from @get_rough_registration
 % meta: the metadata object output updated from either @get_search_grids
-% function or @initial_affine_transformation_parameters for the initial or
-% affine transformation steps respectively. 
-% opt: initial_transformation or affine_transformation
+% function or @initialize_high_res_transformation_parameters for the
+% initial or high res transformation steps respectively. 
+% opt: initial_transformation or high_res_transformation
 %% ----------------------------------
 function [fixed_image, meta] = ...
     distribute_registration_tasks(fixed_image, moving_image, meta, opt)
+%
+msg = ['Setting up parallel tasks for ', replace(opt, '_', ' ')];
+logger(msg, 'INFO', meta)
 %
 input_reg_data = mergestructs(...
     meta.(opt).input_reg_data, meta.input_reg_data);
